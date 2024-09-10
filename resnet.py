@@ -46,8 +46,3 @@ class Bottleneck(nn.Module):
         x += identity
         x = self.relu(x)
         return x
-
-
-
-
-
