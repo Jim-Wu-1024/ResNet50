@@ -49,11 +49,11 @@ class Bottleneck(nn.Module):
         x += identity
         x = self.relu(x)
         return x
-    
+
 
 class ResNet(nn.Module):  # layers: [3, 4, 6, 3] --> ResNet50
     def __init__(self, block: Bottleneck, layers: list, image_channels: int, num_classes: int):
-        super().__init__() 
+        super().__init__()
         self.in_channels = 64
         self.conv1 = nn.Conv2d(image_channels, 64, kernel_size=7, stride=2, padding=3, bias=False)
         self.bn1 = nn.BatchNorm2d(64)
@@ -67,8 +67,8 @@ class ResNet(nn.Module):  # layers: [3, 4, 6, 3] --> ResNet50
         self.layer4 = self._make_layer(block, layers[3], out_channels=512, stride=2)
 
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(512*4, num_classes)
-    
+        self.fc = nn.Linear(512 * 4, num_classes)
+
     def forward(self, x):
         # input: [bs, 3, 224, 224]
         x = self.conv1(x)
@@ -85,15 +85,15 @@ class ResNet(nn.Module):  # layers: [3, 4, 6, 3] --> ResNet50
         x = x.view(x.size(0), -1)
         x = self.fc(x)  # [bs, 1000]
         return x
-    
+
     def _make_layer(self, block: Bottleneck, num_residual_blocks: int, out_channels: int, stride: int):
         downsample = None
         layers = []
 
         if stride != 1 or self.in_channels != out_channels * 4:
-            downsample = nn.Sequential(nn.Conv2d(self.in_channels, out_channels*4, kernel_size=1,
-                                    stride=stride),
-                                    nn.BatchNorm2d(out_channels*4))
+            downsample = nn.Sequential(nn.Conv2d(self.in_channels, out_channels * 4, kernel_size=1,
+                                                 stride=stride),
+                                       nn.BatchNorm2d(out_channels * 4))
         layers.append(block(self.in_channels, out_channels, stride, downsample))
         self.in_channels = out_channels * 4
 
@@ -104,7 +104,7 @@ class ResNet(nn.Module):  # layers: [3, 4, 6, 3] --> ResNet50
 
 
 def build_ResNet50(image_channels=3, num_classes=1000):
-    return ResNet(Bottleneck, [3, 4, 6,3], image_channels, num_classes)
+    return ResNet(Bottleneck, [3, 4, 6, 3], image_channels, num_classes)
 
 
 if __name__ == '__main__':
